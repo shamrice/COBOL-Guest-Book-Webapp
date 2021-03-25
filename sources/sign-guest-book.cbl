@@ -47,7 +47,6 @@
        01  ws-guest-book-entry.
            05  ws-guest-name        pic x(256).
            05  ws-guest-email       pic x(256).
-           05  ws-guest-date        pic x(256).
            05  ws-guest-comment     pic x(1024).
 
        EXEC SQL
@@ -145,7 +144,6 @@
                    move function
                        get-param-value(f-chunk-of-post, "comment")
                        to ws-guest-comment
-                   move current-date to ws-guest-date
 
                    if function trim(ws-guest-name) = spaces then
                        move "Anonymous" to ws-guest-name

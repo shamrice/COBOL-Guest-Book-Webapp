@@ -141,7 +141,6 @@
            move function substitute(l-html-decoded-string, "%40", "@")
            to l-html-decoded-string
 
-
            move function substitute(l-html-decoded-string, "%7E", "~")
            to l-html-decoded-string
 
