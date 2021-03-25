@@ -93,7 +93,12 @@
 
            perform process-new-entry
 
-           display "</body></html>"
+           display
+               '<a href="'
+               'https://github.com/shamrice/COBOL-Guest-Book-Webapp">'
+               "COBOL Source Code</a>"
+               "</body></html>"
+           end-display
 
            goback.
 

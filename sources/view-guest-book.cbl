@@ -128,7 +128,8 @@
            perform sqlstate-check
 
            display
-               '<a href="https://www.github.com/shamrice">'
+               '<a href="'
+               'https://github.com/shamrice/COBOL-Guest-Book-Webapp">'
                "COBOL Source Code</a>"
                "</body></html>"
            end-display
