@@ -2,9 +2,9 @@
       *>****************************************************************
       *> Author: Erik Eriksen
       *> Create Date: 2021-03-23
-      *> Last Modified: 2021-03-23
+      *> Last Modified: 2021-03-25
       *> Purpose: Displays web page with current contents of guest book
-      *>          in database.
+      *>          table in database.
       *> Tectonics: ./build_and_deploy.sh
       *>*****************************************************************
        identification division.
@@ -30,9 +30,6 @@
        END-EXEC.
        01  HOSTVARS.
            05  BUFFER               PIC X(1024).
-           05  hVarD                PIC S9(5)V99.
-           05  hVarC                PIC X(1024).
-           05  hVarN                PIC 9(12).
 
        01  ws-guest-book-entry.
            05  ws-guest-name        pic x(256).
@@ -51,7 +48,7 @@
 
        procedure division.
 
-
+      * TODO : This should be read from a config not hard coded.
            STRING 'DRIVER={PostgreSQL Unicode};'
                 'SERVER=localhost;'
                 'PORT=5432;'
@@ -64,10 +61,7 @@
                CONNECT TO :BUFFER
            END-EXEC.
 
-      *>perform generate-fake-data
-
            display "Content-type: text/html" newline
-
            display
                "<!DOCTYPE html>"
                "<html><head><title>GnuCOBOL Sample Guest Book - "

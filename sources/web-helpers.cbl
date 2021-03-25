@@ -2,7 +2,7 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2021-03-23
-      * Last Modified: 2021-03-23
+      * Last Modified: 2021-03-25
       * Purpose: Returns the found value for a parameter in a key value
       *          map string like a query string or post values. Returns
       *          space when search parameter is not found.
@@ -46,19 +46,14 @@
            using l-raw-map-string, l-param-search-key
            returning l-found-value.
 
-
            move 1 to ls-starting-pointer
            move space to l-found-value
-
-  *>  display "Raw query string: " l-raw-query-string
 
            inspect function trim(l-raw-map-string)
            tallying ls-num-keys for all '='
 
-   *> display "Num keys: " ls-num-keys
-
            if ls-num-keys = 0 then
-      *>  display "No query string to parse."
+      *        Nothing to parse
                goback
            end-if
 
@@ -72,7 +67,6 @@
            end-perform
 
            perform varying ls-idx from 1 by 1 until ls-idx > ls-num-keys
-      *>  display "<br>" ls-raw-query-strings(ls-idx)
 
                if ls-raw-key-value-strings(ls-idx) not = spaces then
                    unstring ls-raw-key-value-strings(ls-idx)
@@ -84,14 +78,13 @@
                    if function trim(ls-string-key(ls-idx)) =
                        function trim(l-param-search-key) then
 
+      *                Value found, return with value.
                        move function trim(ls-string-value(ls-idx))
                        to l-found-value
-         *>       display "FOUND VALUE FOR KEY " l-query-param-name " :: " l-query-param-found-value "<br>"
+                       goback
+
                    end-if
-
-         *>   display "name: " ls-query-string-name(ls-idx) " value: " ls-query-string-value(ls-idx) "<br>"
                end-if
-
            end-perform
 
            goback.
