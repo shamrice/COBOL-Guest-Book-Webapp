@@ -6,7 +6,7 @@ The following are needed in order to build and deploy the project:
 * GnuCOBOL - https://sourceforge.net/projects/gnucobol/
 * esqlOC Precompiler - https://sourceforge.net/p/gnucobol/contrib/HEAD/tree/trunk/esql/
 * unixODBC - http://www.unixodbc.org/
-* postgresql - Postgresql database installed.
+* PostgreSQL Database - https://www.postgresql.org/
 * odbc-postgresql - Postgres ODBC driver
 * Apache2 web server - https://httpd.apache.org/
 
