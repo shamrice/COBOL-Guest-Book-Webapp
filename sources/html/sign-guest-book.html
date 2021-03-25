@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>GnuCOBOL Sample Guest Book - Sign Guest Book</title>
+    <style type="text/css">
+        .field-label { text-align: right; }
+        .field-buttons { text-align: center; }
+    </style>
+</head>
+<body>
+<h2><a href="/cgi-bin/view-guest-book.cgi">View Guest Book</a> | Sign Guest Book</h2>
+<p>
+    <b>Written in GnuCOBOL by Erik Eriksen</b>
+</p>
+<hr />
+<form action="/cgi-bin/sign-guest-book.cgi" method="post">
+    <table>
+    <tr>
+        <td class="field-label">Name:</td><td><input type="text" name="name"></td>
+    </tr>
+    <tr>
+        <td class="field-label">Email:</td><td><input type="email" name="email"></td>
+    </tr>
+    <tr>
+        <td class="field-label">Comment:</td>
+        <td><textarea rows="10" cols="50" name="comment"></textarea></td>
+    </tr>
+    <tr>
+        <td class="field-label">What is five times four?</td>
+        <td><input type="text" name="answer"/></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>
+            <input type="submit" value="Sign Guest Book">&nbsp;<input type="reset">
+        </td>
+    </tr>
+    </table>
+</form>
+<hr />
+</body>
+</html>
