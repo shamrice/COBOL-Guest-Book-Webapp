@@ -1,6 +1,14 @@
 # COBOL Guest Book WebApp
-A simple guest book demonstration written in GnuCOBOL
+A simple website guest book demonstration written in GnuCOBOL
 
+## How to build
+Building the project can be done by running the "build_and_deploy.sh" shell
+script itn he sources directory.
+
+The following variables can be set:
+* DEPLOY_CODE - set to true to copy compiled COBOL source files and HTML documents to local web server directories.
+* HTML_DEST_DIR - Location to copy HTML files to in file system. (Default: /var/www/html)
+* CGI_BIN_DEST_DIR - Location to copy the compiled COBOL files to. (Default: /usr/lib/cgi-bin)
 
 ## Screen shots
 
