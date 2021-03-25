@@ -2,13 +2,17 @@
       ******************************************************************
       * Author: Erik Eriksen
       * Create Date: 2021-03-23
-      * Last Modified: 2021-03-24
-      * Purpose: Displays web page with current contents of guest book
-      *          in database.
+      * Last Modified: 2021-03-25
+      * Purpose: Page that receives the POST event from the sign guest
+      *          book form from the HTML page. Checks if simple math
+      *          question is correct (to deter bots) and if comment field
+      *          is populated. If so, entry is added to the database.
+      *          HTML displayed to the user is status of guest book
+      *          signing as well as links to sign again and view contents.
       * Tectonics: ./build_and_deploy.sh
       ******************************************************************
        identification division.
-       program-id. view-guest-book.
+       program-id. sign-guest-book.
 
        environment division.
 
@@ -39,9 +43,6 @@
        END-EXEC.
        01  HOSTVARS.
            05  BUFFER               PIC X(1024).
-           05  hVarD                PIC S9(5)V99.
-           05  hVarC                PIC X(1024).
-           05  hVarN                PIC 9(12).
 
        01  ws-guest-book-entry.
            05  ws-guest-name        pic x(256).
@@ -53,44 +54,12 @@
           END DECLARE SECTION
        END-EXEC.
 
-       01  name-count           constant as 25.
-       01  name-index           pic 99 usage comp-5.
-       01  value-string         pic x(2046).
+       01  ws-http-request-method-header constant as "REQUEST_METHOD".
+
+       01  ws-http-value-string pic x(2046).
            88  IS-POST          value 'POST'.
 
-       01  environment-names.
-           02  name-strings.
-               03  filler        pic x(20) value 'DOCUMENT_ROOT'.
-               03  filler        pic x(20) value 'GATEWAY_INTERFACE'.
-               03  filler        pic x(20) value 'HTTP_ACCEPT'.
-               03  filler        pic x(20) value 'HTTP_ACCEPT_CHARSET'.
-               03  filler        pic x(20) value 'HTTP_ACCEPT_ENCODING'.
-               03  filler        pic x(20) value 'HTTP_ACCEPT_LANGUAGE'.
-               03  filler        pic x(20) value 'HTTP_CONNECTION'.
-               03  filler        pic x(20) value 'HTTP_HOST'.
-               03  filler        pic x(20) value 'HTTP_USER_AGENT'.
-               03  filler        pic x(20) value 'LIB_PATH'.
-               03  filler        pic x(20) value 'PATH'.
-               03  filler        pic x(20) value 'QUERY_STRING'.
-               03  filler        pic x(20) value 'REMOTE_ADDR'.
-               03  filler        pic x(20) value 'REMOTE_PORT'.
-               03  filler        pic x(20) value 'REQUEST_METHOD'.
-               03  filler        pic x(20) value 'REQUEST_URI'.
-               03  filler        pic x(20) value 'SCRIPT_FILENAME'.
-               03  filler        pic x(20) value 'SCRIPT_NAME'.
-               03  filler        pic x(20) value 'SERVER_ADDR'.
-               03  filler        pic x(20) value 'SERVER_ADMIN'.
-               03  filler        pic x(20) value 'SERVER_NAME'.
-               03  filler        pic x(20) value 'SERVER_PORT'.
-               03  filler        pic x(20) value 'SERVER_PROTOCOL'.
-               03  filler        pic x(20) value 'SERVER_SIGNATURE'.
-               03  filler        pic x(20) value 'SERVER_SOFTWARE'.
-           02  filler redefines name-strings.
-               03  name-string    pic x(20) occurs name-count times.
-               88  IS-REQUEST-METHOD        value 'REQUEST_METHOD'.
-               88  IS-QUERY-STRING          value "QUERY_STRING".
-
-       01  ws-input-status      pic xx.
+       01  ws-input-status          pic xx.
        01  ws-file-status           pic xx.
        01  newline                  pic x value x'0a'.
 
@@ -130,94 +99,82 @@
 
 
        process-new-entry.
+           accept ws-http-value-string
+               from environment ws-http-request-method-header
+           end-accept
 
+      * Remove potentially bad strings
+           inspect ws-http-value-string converting "<>&" to spaces
 
-           perform varying name-index
-               from 1 by 1 until name-index > name-count
+           if IS-POST then
 
-               accept value-string from environment
-                   name-string(name-index)
-               end-accept
-
-        *> cleanse any potential danger, thoughtlessly
-               inspect value-string converting "<>&" to "   "
-
-               if IS-REQUEST-METHOD(name-index) and IS-POST then
-
-            *> open a channel to the POST data, KEYBOARD
-            *> read what's there, in a loop normally
-            *> and close. For real world, this would
-            *> have more intelligent defensive programming
-            *>   and likely fatter buffers
-
-                   open input fd-web-input
-                       if ws-input-status < 10 then
-                           read fd-web-input end-read
-                           if ws-input-status > 9 then
-                               move spaces to f-chunk-of-post
-                           end-if
+               open input fd-web-input
+                   if ws-input-status < 10 then
+                       read fd-web-input end-read
+                       if ws-input-status > 9 then
+                           move spaces to f-chunk-of-post
                        end-if
-                   close fd-web-input
+                   end-if
+               close fd-web-input
 
-                   *> cleanse any potential danger, thoughtlessly
-                   inspect f-chunk-of-post converting "<>&" to spaces
+               *> Remove bad strings in form post contents.
+               inspect f-chunk-of-post converting "<>&" to spaces
 
+               move function
+                   get-param-value(f-chunk-of-post, "answer")
+                   to ws-temp
+
+               if trim(ws-temp) not = "20" then
+                   display
+                       '<h2 style="color:red;">Wrong answer. '
+                       "Not saving entry. : " ws-temp "</h2>"
+                   end-display
+                   exit paragraph
+               else
                    move function
-                       get-param-value(f-chunk-of-post, "answer")
-                       to ws-temp
+                       get-param-value(f-chunk-of-post, "name")
+                       to ws-guest-name
+                   move function
+                       get-param-value(f-chunk-of-post, "email")
+                       to ws-guest-email
+                   move function
+                       get-param-value(f-chunk-of-post, "comment")
+                       to ws-guest-comment
+                   move current-date to ws-guest-date
 
-                   if trim(ws-temp) not = "20" then
+                   if function trim(ws-guest-name) = spaces then
+                       move "Anonymous" to ws-guest-name
+                   end-if
+
+                   if function trim(ws-guest-comment) = spaces then
                        display
-                           '<h2 style="color:red;">Wrong answer. '
-                           "Not saving entry. : " ws-temp "</h2>"
+                           '<h2 style="color:red;">Comment field '
+                           "cannot be blank. Please try again.</h2>"
                        end-display
                        exit paragraph
-                   else
-                       move function
-                           get-param-value(f-chunk-of-post, "name")
-                           to ws-guest-name
-                       move function
-                           get-param-value(f-chunk-of-post, "email")
-                           to ws-guest-email
-                       move function
-                           get-param-value(f-chunk-of-post, "comment")
-                           to ws-guest-comment
-                       move current-date to ws-guest-date
-
-                       if function trim(ws-guest-name) = spaces then
-                           move "Anonymous" to ws-guest-name
-                       end-if
-
-                       if function trim(ws-guest-comment) = spaces then
-                           display
-                               '<h2 style="color:red;">Comment field '
-                               "cannot be blank. Please try again.</h2>"
-                           end-display
-                           exit paragraph
-                       end-if
-
-                       move function
-                       html-decode(ws-guest-name) to ws-guest-name
-                       move function
-                       html-decode(ws-guest-email) to ws-guest-email
-                       move function
-                       html-decode(ws-guest-comment) to ws-guest-comment
-
-                       perform insert-into-database
-
-                       display
-                           '<h2 style="text-align:center;">'
-                           "Thank you for signing the guest book!</h2>"
-                       end-display
                    end-if
-               end-if
 
-           end-perform
+                   move function
+                   html-decode(ws-guest-name) to ws-guest-name
+                   move function
+                   html-decode(ws-guest-email) to ws-guest-email
+                   move function
+                   html-decode(ws-guest-comment) to ws-guest-comment
+
+                   perform insert-into-database
+
+                   display
+                       '<h2 style="text-align:center;">'
+                       "Thank you for signing the guest book!</h2>"
+                   end-display
+               end-if
+           end-if
 
            exit paragraph.
 
 
        insert-into-database.
+      *> TODO : This should be read from a config file instead of hardcoded.
            STRING 'DRIVER={PostgreSQL Unicode};'
                 'SERVER=localhost;'
                 'PORT=5432;'
@@ -262,4 +219,4 @@
            end-if
            exit section.
 
-       end program view-guest-book.
+       end program sign-guest-book.
