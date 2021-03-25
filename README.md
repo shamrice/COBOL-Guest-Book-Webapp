@@ -1,6 +1,12 @@
 # COBOL Guest Book WebApp
 A simple website guest book demonstration written in GnuCOBOL
 
+*Note:* This project was created for the sole purpose of demonstrating a way to use GnuCOBOL to
+create a web application that interacts with a database. As with any internet
+facing web site, there are security risks. This code makes almost no
+attempt to mitigate these risks and care should be taken before using the source
+code in this repo in a live environment.
+
 ## Requirements to build & deploy
 The following are needed in order to build and deploy the project:
 * GnuCOBOL - https://sourceforge.net/projects/gnucobol/
