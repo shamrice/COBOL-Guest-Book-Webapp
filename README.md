@@ -28,6 +28,12 @@ The following variables can be set:
 * HTML_DEST_DIR - Location to copy HTML files to in file system. (Default: /var/www/html)
 * CGI_BIN_DEST_DIR - Location to copy the compiled COBOL files to. (Default: /usr/lib/cgi-bin)
 
+
+## Live Demo
+Below is a link to the a live demo of this software running. No guarantee on any uptime for this test server. It may be taken down at any time.
+[Live Demo Link](http://eriksguestbook.servehttp.com:9574/cgi-bin/view-guest-book.cgi)
+
+
 ## Screen shots
 
 ### View guest book entries:
